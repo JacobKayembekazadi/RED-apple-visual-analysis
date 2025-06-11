@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Apple Coaching: AI Visual Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'main': '#003F5C',
+              'accent-1': '#D45087',
+              'accent-1-light': 'rgba(212, 80, 135, 0.1)',
+              'accent-2': '#FF7C43',
+              'accent-2-light': 'rgba(255, 124, 67, 0.2)',
+              'accent-3': '#FFA600',
+            }
+          }
+        }
+      }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      /* Basic styles for chart containers to ensure they have a defined height */
+      .chart-container {
+        position: relative;
+        height: 300px; /* Default height, can be overridden by specific chart needs or parent sizing */
+        width: 100%;
+      }
+       body {
+        font-family: 'Inter', sans-serif; /* A nice default sans-serif font */
+        background-color: #f0f2f5; /* A light grey background for the page */
+      }
+      /* Ensure fonts are loaded if not part of Tailwind default */
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+      /* Modal Animation Keyframes */
+      @keyframes modalShowAnimation {
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .animate-modalShow {
+        animation: modalShowAnimation 0.3s forwards;
+      }
+
+      /* Prose custom styling (e.g., for AI generated content) */
+      .prose strong {
+        color: #D45087; /* Corresponds to accent-1 */
+      }
+      
+      .modal-bg { background-color: rgba(0, 0, 0, 0.5); }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.4.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!-- Main application script -->
+    <script type="module" src="./index.tsx"></script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
