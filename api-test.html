@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenRouter API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>OpenRouter API Test</h1>
+      <div class="container">
+        <h2>Direct API Test</h2>
+        <p>This will test the OpenRouter API using the provided API key.</p>
+        <p><strong>Note:</strong> If you receive a 401 error, your API key may be expired or invalid. Please check your OpenRouter account at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">https://openrouter.ai/keys</a> and generate a new key.</p>
+        <button id="testApi">Test API Connection</button>
+        <div id="response">Results will appear here...</div>
+    </div>
+    
+    <div class="container">
+        <h2>Troubleshooting</h2>
+        <ol>
+            <li>Verify your API key is valid and hasn't expired</li>
+            <li>Try the API key with curl: <code>curl -s -H "Authorization: Bearer YOUR_API_KEY" https://openrouter.ai/api/v1/models</code></li>
+            <li>Ensure you're not hitting any rate limits or usage quotas</li>
+            <li>Check if the model ID in constants.ts is valid: <code>deepseek/deepseek-r1-0528:free</code></li>
+            <li>Try a different model if this one is unavailable</li>
+        </ol>
+    </div>
+
+    <script>
+        document.getElementById('testApi').addEventListener('click', async function() {
+            const responseElement = document.getElementById('response');
+            responseElement.innerHTML = 'Testing API connection...';
+            responseElement.className = '';
+
+            try {                // Using a hardcoded key as a test - same as in openrouterService.ts
+                const apiKey = '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';
+                
+                console.log("Testing with API key:", apiKey.substring(0, 10) + "...");
+                
+                // First try a simple endpoint that doesn't cost tokens
+                const modelsResponse = await fetch('https://openrouter.ai/api/v1/models', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    }
+                });
+
+                if (!modelsResponse.ok) {
+                    throw new Error(`HTTP error! Status: ${modelsResponse.status}`);
+                }
+
+                const modelsData = await modelsResponse.json();
+                
+                responseElement.innerHTML = '✅ API key appears valid. Models available:\n\n';
+                responseElement.innerHTML += JSON.stringify(modelsData, null, 2);
+                responseElement.className = 'success';
+
+                // Now try a simple completion to test the full flow
+                responseElement.innerHTML += '\n\nTesting completion API...\n';
+                
+                const completionResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json',
+                        'HTTP-Referer': window.location.href,
+                        'X-Title': 'API Test Page'
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek/deepseek-r1-0528:free',
+                        messages: [
+                            {
+                                role: 'user',
+                                content: 'Say "API test successful" if you receive this message.'
+                            }
+                        ]
+                    })
+                });
+
+                if (!completionResponse.ok) {
+                    const errorText = await completionResponse.text();
+                    throw new Error(`Completion API error! Status: ${completionResponse.status}, Details: ${errorText}`);
+                }
+
+                const completionData = await completionResponse.json();
+                responseElement.innerHTML += '\n\n✅ Completion API test successful!\n';
+                responseElement.innerHTML += 'Response content: ' + completionData.choices[0].message.content;
+
+            } catch (error) {
+                responseElement.innerHTML = '❌ API Test Failed: ' + error.message;
+                responseElement.className = 'error';
+                console.error('API test error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

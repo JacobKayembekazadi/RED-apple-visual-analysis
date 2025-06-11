@@ -86,4 +86,12 @@ export const CLIENT_GROWTH_CHART_OPTIONS: ChartOptions = {
   plugins: { legend: { display: false }, tooltip: { callbacks: { title: tooltipTitleCallback } } }
 };
 
+// OpenRouter configuration
 export const OPENROUTER_MODEL = 'deepseek/deepseek-r1-0528:free';
+
+// API Provider configuration
+export const API_PROVIDER = {
+  PRIMARY: 'openrouter',  // 'openrouter' or 'google'
+  USE_FALLBACK: true,     // Whether to try fallback provider when primary fails
+  USE_LOCAL_PROXY: false  // Whether to use the local proxy server for OpenRouter
+};

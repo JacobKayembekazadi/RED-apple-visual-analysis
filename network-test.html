@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Connectivity Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .test-container {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .test-description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .results {
+            margin-top: 12px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #f1f1f1;
+            padding: 12px;
+            border-radius: 4px;
+            height: 150px;
+            overflow-y: auto;
+        }
+        .success {
+            color: green;
+        }
+        .failure {
+            color: red;
+        }
+        .warning {
+            color: orange;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Network Connectivity Diagnostic Tool</h1>
+    <p>Use this tool to diagnose connectivity issues with the OpenRouter API.</p>
+    
+    <div class="test-container">
+        <div class="test-title">1. Basic Network Connectivity</div>
+        <div class="test-description">
+            Tests if your device can connect to the internet by pinging common services.
+        </div>
+        <button onclick="testBasicConnectivity()">Test Basic Connectivity</button>
+        <div id="basic-results" class="results">Results will appear here...</div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">2. OpenRouter API Connectivity</div>
+        <div class="test-description">
+            Tests if your device can connect specifically to OpenRouter's API endpoints.
+        </div>
+        <button onclick="testOpenRouterConnectivity()">Test OpenRouter API</button>
+        <div id="openrouter-results" class="results">Results will appear here...</div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">3. Authentication Test</div>
+        <div class="test-description">
+            Tests if your OpenRouter API key is valid.
+        </div>
+        <div style="display: flex; margin-bottom: 10px;">
+            <input type="text" id="api-key" placeholder="Enter your OpenRouter API key" style="flex: 1; padding: 8px; margin-right: 10px;">
+            <button onclick="testAuthentication()">Test Authentication</button>
+        </div>
+        <div id="auth-results" class="results">Results will appear here...</div>
+    </div>
+    
+    <h2>Troubleshooting Guide</h2>
+    <table>
+        <tr>
+            <th>Issue</th>
+            <th>Possible Solutions</th>
+        </tr>
+        <tr>
+            <td>Basic connectivity failure</td>
+            <td>
+                <ul>
+                    <li>Check your internet connection</li>
+                    <li>Disable any active VPN services</li>
+                    <li>Check if your firewall is blocking connections</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>OpenRouter API connectivity failure</td>
+            <td>
+                <ul>
+                    <li>Check if openrouter.ai is accessible in your region</li>
+                    <li>Try using a different network (mobile hotspot, etc.)</li>
+                    <li>Check if your network has restrictions on API services</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>Authentication failure</td>
+            <td>
+                <ul>
+                    <li>Verify your API key is correctly formatted (should start with sk-or-...)</li>
+                    <li>Check if your API key has expired (OpenRouter keys can expire)</li>
+                    <li>Generate a new API key at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">openrouter.ai/keys</a></li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+        // Log output to the specified element
+        function log(elementId, message, type = '') {
+            const resultsElement = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.textContent = `[${timestamp}] ${message}`;
+            if (type) entry.classList.add(type);
+            resultsElement.appendChild(entry);
+            resultsElement.scrollTop = resultsElement.scrollHeight;
+        }
+
+        // Clear the results element
+        function clearResults(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        // Test basic internet connectivity
+        async function testBasicConnectivity() {
+            const resultsId = 'basic-results';
+            clearResults(resultsId);
+            log(resultsId, 'Starting basic connectivity tests...');
+            
+            const sites = [
+                { name: 'Google', url: 'https://www.google.com' },
+                { name: 'Cloudflare DNS', url: 'https://1.1.1.1' },
+                { name: 'Microsoft', url: 'https://www.microsoft.com' }
+            ];
+            
+            let overallSuccess = true;
+            
+            for (const site of sites) {
+                try {
+                    log(resultsId, `Testing connection to ${site.name}...`);
+                    const startTime = performance.now();
+                    const response = await fetch(site.url, { 
+                        method: 'HEAD',
+                        mode: 'no-cors',
+                        cache: 'no-cache',
+                        signal: AbortSignal.timeout(5000)
+                    });
+                    const endTime = performance.now();
+                    const duration = Math.round(endTime - startTime);
+                    log(resultsId, `✅ Connected to ${site.name} in ${duration}ms`, 'success');
+                } catch (error) {
+                    log(resultsId, `❌ Failed to connect to ${site.name}: ${error.message}`, 'failure');
+                    overallSuccess = false;
+                }
+            }
+            
+            if (overallSuccess) {
+                log(resultsId, '✅ Basic connectivity test passed. You have internet access.', 'success');
+            } else {
+                log(resultsId, '⚠️ Basic connectivity test showed issues. Check your internet connection.', 'warning');
+            }
+        }
+
+        // Test OpenRouter API connectivity
+        async function testOpenRouterConnectivity() {
+            const resultsId = 'openrouter-results';
+            clearResults(resultsId);
+            log(resultsId, 'Testing OpenRouter API connectivity...');
+            
+            const endpoints = [
+                { name: 'OpenRouter Health', url: 'https://openrouter.ai/api/v1/health' },
+                { name: 'OpenRouter Status', url: 'https://openrouter.ai/status' }
+            ];
+            
+            let overallSuccess = true;
+            
+            for (const endpoint of endpoints) {
+                try {
+                    log(resultsId, `Testing connection to ${endpoint.name}...`);
+                    const startTime = performance.now();
+                    
+                    // Use mode: 'no-cors' to check if the endpoint is reachable
+                    const response = await fetch(endpoint.url, {
+                        method: 'GET',
+                        mode: 'cors',
+                        cache: 'no-cache',
+                        signal: AbortSignal.timeout(5000)
+                    });
+                    
+                    const endTime = performance.now();
+                    const duration = Math.round(endTime - startTime);
+                    
+                    if (response.status >= 200 && response.status < 500) {
+                        log(resultsId, `✅ Connected to ${endpoint.name} (${response.status}) in ${duration}ms`, 'success');
+                    } else {
+                        log(resultsId, `⚠️ Unexpected status from ${endpoint.name}: ${response.status}`, 'warning');
+                        overallSuccess = false;
+                    }
+                } catch (error) {
+                    log(resultsId, `❌ Failed to connect to ${endpoint.name}: ${error.message}`, 'failure');
+                    overallSuccess = false;
+                }
+            }
+            
+            // CORS test for OpenRouter API
+            try {
+                log(resultsId, 'Testing CORS preflight for OpenRouter API...');
+                
+                const corsCheckResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': window.location.origin
+                    }
+                });
+                
+                if (corsCheckResponse.ok) {
+                    log(resultsId, '✅ CORS preflight check passed', 'success');
+                } else {
+                    log(resultsId, `⚠️ CORS preflight check returned status: ${corsCheckResponse.status}`, 'warning');
+                    overallSuccess = false;
+                }
+            } catch (error) {
+                log(resultsId, `❌ CORS preflight check failed: ${error.message}`, 'failure');
+                overallSuccess = false;
+            }
+            
+            if (overallSuccess) {
+                log(resultsId, '✅ OpenRouter API connectivity test passed.', 'success');
+            } else {
+                log(resultsId, '⚠️ There are issues connecting to the OpenRouter API. See details above.', 'warning');
+            }
+        }
+
+        // Test authentication with OpenRouter API
+        async function testAuthentication() {
+            const resultsId = 'auth-results';
+            clearResults(resultsId);
+            
+            const apiKey = document.getElementById('api-key').value.trim();
+            
+            if (!apiKey) {
+                log(resultsId, '❌ Please enter an API key', 'failure');
+                return;
+            }
+            
+            log(resultsId, 'Testing authentication with OpenRouter API...');
+            log(resultsId, `Using API key: ${apiKey.substring(0, 10)}...`);
+            
+            try {
+                const response = await fetch('https://openrouter.ai/api/v1/models', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    signal: AbortSignal.timeout(10000)
+                });
+                
+                if (response.status === 200) {
+                    const data = await response.json();
+                    log(resultsId, '✅ Authentication successful!', 'success');
+                    log(resultsId, `Available models: ${data.data.length}`);
+                    
+                    // Check if our model is available
+                    const ourModel = data.data.find(model => model.id === 'deepseek/deepseek-r1-0528');
+                    if (ourModel) {
+                        log(resultsId, '✅ The application\'s model (deepseek/deepseek-r1-0528) is available', 'success');
+                    } else {
+                        log(resultsId, '⚠️ The application\'s model (deepseek/deepseek-r1-0528) was not found in available models', 'warning');
+                    }
+                } else if (response.status === 401) {
+                    log(resultsId, '❌ Authentication failed: Invalid API key', 'failure');
+                    
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.error && errorData.error.message) {
+                            log(resultsId, `Error message: ${errorData.error.message}`, 'failure');
+                        }
+                    } catch (e) {
+                        // Ignore JSON parse errors
+                    }
+                } else {
+                    log(resultsId, `⚠️ Unexpected status code: ${response.status}`, 'warning');
+                    
+                    try {
+                        const errorData = await response.text();
+                        log(resultsId, `Response: ${errorData}`, 'warning');
+                    } catch (e) {
+                        // Ignore text parse errors
+                    }
+                }
+            } catch (error) {
+                log(resultsId, `❌ Request failed: ${error.message}`, 'failure');
+            }
+        }
+
+        // Initialize with API key from URL parameter if available
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const apiKey = urlParams.get('key');
+            if (apiKey) {
+                document.getElementById('api-key').value = apiKey;
+            }
+        }
+    </script>
+</body>
+</html>

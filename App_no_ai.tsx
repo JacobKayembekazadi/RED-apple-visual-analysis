@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChartData, ChartOptions, DevelopmentArea } from './types';
 import {
+  CHART_COLORS,
   DEVELOPMENT_AREAS,
   SCRIPTING_IMPACT_CHART_DATA,
   SCRIPTING_IMPACT_CHART_OPTIONS,
   CLIENT_GROWTH_CHART_DATA,
   CLIENT_GROWTH_CHART_OPTIONS,
 } from './constants';
+import Spinner from './components/Spinner';
 import Modal from './components/Modal';
 
 const App: React.FC = () => {
@@ -17,7 +19,8 @@ const App: React.FC = () => {
   const scriptingImpactChartRef = useRef<HTMLCanvasElement>(null);
   const clientGrowthChartRef = useRef<HTMLCanvasElement>(null);
   const chartInstancesRef = useRef<{ [key: string]: any }>({});
-  const initializeChart = useCallback((canvasRef: React.RefObject<HTMLCanvasElement | null>, chartId: string, type: string, data: ChartData, options: ChartOptions) => {
+
+  const initializeChart = useCallback((canvasRef: React.RefObject<HTMLCanvasElement>, chartId: string, type: string, data: ChartData, options: ChartOptions) => {
     if (canvasRef.current && (window as any).Chart) {
       if (chartInstancesRef.current[chartId]) {
         chartInstancesRef.current[chartId].destroy();
@@ -203,146 +206,54 @@ const App: React.FC = () => {
             <div className="chart-container"><canvas ref={clientGrowthChartRef}></canvas></div>
           </div>
         </div>
-      </section>      {/* Coaching Excellence Section */}
+      </section>
+
+      {/* Coaching Excellence Section */}
       <section id="coaching-excellence" className="mb-16">
-        <div className="bg-gradient-to-br from-white via-gray-50 to-accent-1-light p-8 rounded-lg shadow-xl text-center relative overflow-hidden">
-          {/* Background decoration */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute top-10 right-10 w-32 h-32 rounded-full bg-accent-1"></div>
-            <div className="absolute bottom-10 left-10 w-24 h-24 rounded-full bg-accent-2"></div>
-          </div>
-          
-          <div className="relative z-10">
-            <h2 className="text-4xl font-bold mb-4">Coaching <span className="text-accent-1">Excellence</span> Framework</h2>
-            <p className="max-w-3xl mx-auto text-lg text-gray-700 mb-12 leading-relaxed">
-              Red Apple Coaching's approach combines Mary-Anne's athletic mindset with proven business strategies to deliver 
-              <span className="font-semibold text-accent-1"> transformational results</span> for real estate professionals.
-            </p>
-            
-            {/* Core Principles Grid */}
-            <div className="max-w-6xl mx-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-                
-                {/* Mindset Transformation Card */}
-                <div className="group bg-white p-8 rounded-xl shadow-lg border-l-4 border-accent-1 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                  <div className="flex items-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-accent-1 to-accent-2 rounded-full flex items-center justify-center text-2xl mr-4 group-hover:scale-110 transition-transform duration-300">
-                      💫
-                    </div>
-                    <div className="text-left">
-                      <h4 className="text-2xl font-bold text-gray-800 mb-1">Mindset Transformation</h4>
-                      <p className="text-accent-1 font-medium">Foundation of Success</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 mb-4 text-left">Shifting from limitation to possibility thinking through proven psychological frameworks</p>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <ul className="text-sm text-gray-700 space-y-2 text-left">
-                      <li className="flex items-center"><span className="w-2 h-2 bg-accent-1 rounded-full mr-3"></span>Overcoming self-imposed barriers</li>
-                      <li className="flex items-center"><span className="w-2 h-2 bg-accent-1 rounded-full mr-3"></span>Building resilience and confidence</li>
-                      <li className="flex items-center"><span className="w-2 h-2 bg-accent-1 rounded-full mr-3"></span>Developing a growth mindset</li>
-                    </ul>
-                  </div>
+        <div className="bg-white p-8 rounded-lg shadow-xl text-center">
+          <h2 className="text-3xl font-bold mb-2">Coaching <span className="text-accent-1">Excellence</span> Framework</h2>
+          <p className="max-w-3xl mx-auto text-gray-600 mb-6">
+            Red Apple Coaching's approach combines Mary-Anne's athletic mindset with proven business strategies to deliver transformational results for real estate professionals.
+          </p>
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+              <h3 className="text-xl font-bold text-accent-1 mb-4">Core Coaching Principles</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="text-left">
+                  <h4 className="font-bold text-lg mb-2">💫 Mindset Transformation</h4>
+                  <p className="text-gray-600 mb-2">Shifting from limitation to possibility thinking</p>
+                  <ul className="text-sm text-gray-700 list-disc pl-5">
+                    <li>Overcoming self-imposed barriers</li>
+                    <li>Building resilience and confidence</li>
+                    <li>Developing a growth mindset</li>
+                  </ul>
                 </div>
-
-                {/* Strategic Implementation Card */}
-                <div className="group bg-white p-8 rounded-xl shadow-lg border-l-4 border-accent-2 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                  <div className="flex items-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-accent-2 to-accent-3 rounded-full flex items-center justify-center text-2xl mr-4 group-hover:scale-110 transition-transform duration-300">
-                      📊
-                    </div>
-                    <div className="text-left">
-                      <h4 className="text-2xl font-bold text-gray-800 mb-1">Strategic Implementation</h4>
-                      <p className="text-accent-2 font-medium">Systems & Processes</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 mb-4 text-left">Proven systems and actionable strategies that translate goals into measurable outcomes</p>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <ul className="text-sm text-gray-700 space-y-2 text-left">
-                      <li className="flex items-center"><span className="w-2 h-2 bg-accent-2 rounded-full mr-3"></span>Business planning and goal setting</li>
-                      <li className="flex items-center"><span className="w-2 h-2 bg-accent-2 rounded-full mr-3"></span>Sales process optimization</li>
-                      <li className="flex items-center"><span className="w-2 h-2 bg-accent-2 rounded-full mr-3"></span>Client relationship management</li>
-                    </ul>
-                  </div>
+                <div className="text-left">
+                  <h4 className="font-bold text-lg mb-2">📊 Strategic Implementation</h4>
+                  <p className="text-gray-600 mb-2">Proven systems and actionable strategies</p>
+                  <ul className="text-sm text-gray-700 list-disc pl-5">
+                    <li>Business planning and goal setting</li>
+                    <li>Sales process optimization</li>
+                    <li>Client relationship management</li>
+                  </ul>
                 </div>
-
-                {/* Performance Acceleration Card */}
-                <div className="group bg-white p-8 rounded-xl shadow-lg border-l-4 border-accent-3 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                  <div className="flex items-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-accent-3 to-main rounded-full flex items-center justify-center text-2xl mr-4 group-hover:scale-110 transition-transform duration-300">
-                      🚀
-                    </div>
-                    <div className="text-left">
-                      <h4 className="text-2xl font-bold text-gray-800 mb-1">Performance Acceleration</h4>
-                      <p className="text-accent-3 font-medium">Rapid Growth</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 mb-4 text-left">Fast-tracking professional growth through targeted skill development and optimization</p>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <ul className="text-sm text-gray-700 space-y-2 text-left">
-                      <li className="flex items-center"><span className="w-2 h-2 bg-accent-3 rounded-full mr-3"></span>Skill development and mastery</li>
-                      <li className="flex items-center"><span className="w-2 h-2 bg-accent-3 rounded-full mr-3"></span>Productivity enhancement</li>
-                      <li className="flex items-center"><span className="w-2 h-2 bg-accent-3 rounded-full mr-3"></span>Time and energy management</li>
-                    </ul>
-                  </div>
+                <div className="text-left">
+                  <h4 className="font-bold text-lg mb-2">🚀 Performance Acceleration</h4>
+                  <p className="text-gray-600 mb-2">Fast-tracking professional growth</p>
+                  <ul className="text-sm text-gray-700 list-disc pl-5">
+                    <li>Skill development and mastery</li>
+                    <li>Productivity enhancement</li>
+                    <li>Time and energy management</li>
+                  </ul>
                 </div>
-
-                {/* Results-Focused Accountability Card */}
-                <div className="group bg-white p-8 rounded-xl shadow-lg border-l-4 border-main hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                  <div className="flex items-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-main to-gray-800 rounded-full flex items-center justify-center text-2xl mr-4 text-white group-hover:scale-110 transition-transform duration-300">
-                      ⚡
-                    </div>
-                    <div className="text-left">
-                      <h4 className="text-2xl font-bold text-gray-800 mb-1">Results-Focused Accountability</h4>
-                      <p className="text-main font-medium">Sustained Success</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 mb-4 text-left">Ensuring consistent progress and outcomes through structured accountability systems</p>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <ul className="text-sm text-gray-700 space-y-2 text-left">
-                      <li className="flex items-center"><span className="w-2 h-2 bg-main rounded-full mr-3"></span>Regular progress tracking</li>
-                      <li className="flex items-center"><span className="w-2 h-2 bg-main rounded-full mr-3"></span>Milestone celebrations</li>
-                      <li className="flex items-center"><span className="w-2 h-2 bg-main rounded-full mr-3"></span>Continuous improvement</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Success Path Visualization */}
-              <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-                <h3 className="text-2xl font-bold text-center mb-8 text-gray-800">The RAC Success Journey</h3>
-                <div className="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0 md:space-x-4">
-                  <div className="flex flex-col items-center text-center flex-1">
-                    <div className="w-20 h-20 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
-                      1
-                    </div>
-                    <h4 className="font-bold text-lg mb-2 text-gray-800">Assessment</h4>
-                    <p className="text-sm text-gray-600">Comprehensive evaluation of current performance and potential</p>
-                  </div>
-                  <div className="hidden md:block text-3xl text-gray-400">→</div>
-                  <div className="flex flex-col items-center text-center flex-1">
-                    <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
-                      2
-                    </div>
-                    <h4 className="font-bold text-lg mb-2 text-gray-800">Strategy</h4>
-                    <p className="text-sm text-gray-600">Customized action plan based on individual goals and challenges</p>
-                  </div>
-                  <div className="hidden md:block text-3xl text-gray-400">→</div>
-                  <div className="flex flex-col items-center text-center flex-1">
-                    <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
-                      3
-                    </div>
-                    <h4 className="font-bold text-lg mb-2 text-gray-800">Implementation</h4>
-                    <p className="text-sm text-gray-600">Guided execution with ongoing support and adjustments</p>
-                  </div>
-                  <div className="hidden md:block text-3xl text-gray-400">→</div>
-                  <div className="flex flex-col items-center text-center flex-1">
-                    <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
-                      4
-                    </div>
-                    <h4 className="font-bold text-lg mb-2 text-gray-800">Results</h4>
-                    <p className="text-sm text-gray-600">Measurable outcomes and sustained growth achievements</p>
-                  </div>
+                <div className="text-left">
+                  <h4 className="font-bold text-lg mb-2">⚡ Results-Focused Accountability</h4>
+                  <p className="text-gray-600 mb-2">Ensuring consistent progress and outcomes</p>
+                  <ul className="text-sm text-gray-700 list-disc pl-5">
+                    <li>Regular progress tracking</li>
+                    <li>Milestone celebrations</li>
+                    <li>Continuous improvement</li>
+                  </ul>
                 </div>
               </div>
             </div>
